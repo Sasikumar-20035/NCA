@@ -1,0 +1,30 @@
+name: SEBI Web Scraper - Monthly
+
+on:
+  schedule:
+    - cron: '30 3 17 * *'   # 3:30 AM UTC on the 17th of every month
+  workflow_dispatch:
+
+jobs:
+  run-sebi-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run for three companies, automatic month/year
+        run: |
+          YEAR=$(date +%Y)
+          MONTH=$(date +%B)
+          python script.py "$YEAR" "$MONTH" "DEZERV INVESTMENTS PRIVATE LIMITED"
+          python script.py "$YEAR" "$MONTH" "CAPITALMIND FINANCIAL SERVICES PRIVATE LIMITED"
+          python script.py "$YEAR" "$MONTH" "WEALTH MANAGERS INDIA PRIVATE LIMITED"
