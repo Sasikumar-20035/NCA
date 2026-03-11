@@ -5,9 +5,9 @@ from selenium.webdriver.support.ui import Select, WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
-import requests
 import time
 import sys
+import requests
 
 n8n_webhook_url = "https://automation.scripbox.io/webhook/defed304-183f-498e-a98e-a32addbafc8d"
 
@@ -57,12 +57,17 @@ for year in years:
             result = ""
             for tr in soup.find_all("tr"):
                 if "No. of clients" in tr.text:
-                    result = tr.text.strip()
+                    tds = tr.find_all(["td", "th"])
+                    if len(tds) > 1:
+                        raw_val = tds[-1].text.strip()
+                    else:
+                        raw_val = tr.text.strip().split('\n')[-1].strip()
+                    import re
+                    result = re.sub(r'[^\d]', '', raw_val)
                     break
 
             payload = {
-                "month": month,
-                "year": year,
+                "month_year": f"{month[:3]} {year}",
                 "pm_name": pm_name,
                 "result": result if result else "Not Found"
             }
